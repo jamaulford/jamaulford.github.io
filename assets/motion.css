@@ -1,0 +1,137 @@
+/* Motion and flow layer for jamaulford.com
+   Inspired by the pacing of unusual.la: full-screen hero, halftone backdrop,
+   spinning logo sticker, fade-up reveals, hover tiles, endless ticker. */
+
+html { scroll-behavior: smooth; }
+body { overflow-x: hidden; }
+
+/* ---------- Fixed header, logo sticker, comma nav ---------- */
+header.site {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+  padding: 18px 28px; margin: 0;
+  transition: background .4s ease, padding .4s ease;
+}
+header.site.scrolled { background: rgba(9,48,57,.88); backdrop-filter: blur(6px); padding: 10px 28px; }
+header.site img {
+  width: 150px; will-change: transform;
+  transition: transform .15s linear, filter .3s ease;
+}
+header.site a:hover img { filter: drop-shadow(0 0 10px rgba(232,155,44,.6)); }
+nav a { margin-left: 0; position: relative; color: var(--gold); }
+nav a:not(:last-child)::after { content: ","; color: var(--gold); margin-right: .5em; }
+nav a:hover { color: var(--ink); }
+main { padding-top: 110px; }
+
+/* ---------- Headline lines slide up on load ---------- */
+h1 .line { display: block; overflow: hidden; padding-bottom: .06em; }
+h1 .line > span { display: inline-block; transform: translateY(105%); transition: transform 1.1s cubic-bezier(.2,.8,.2,1); transition-delay: calc(var(--i) * .12s + .1s); }
+body.ready h1 .line > span { transform: none; }
+
+/* ---------- Home hero: full screen, centered, halftone ---------- */
+body.home main { padding-top: 0; }
+body.home .hero {
+  position: relative; min-height: 100vh; min-height: 100svh;
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  text-align: center; padding: 120px 0 90px; isolation: isolate;
+}
+body.home .hero::before,
+body.home .hero::after {
+  content: ""; position: absolute; z-index: -1; top: 0; bottom: 0;
+  left: calc(50% - 50vw); width: 100vw; pointer-events: none;
+}
+/* the dot screen */
+body.home .hero::before {
+  background-image: radial-gradient(circle, rgba(232,155,44,.55) 1.3px, transparent 1.8px);
+  background-size: 9px 9px;
+  -webkit-mask-image: radial-gradient(ellipse 34% 46% at var(--mx,50%) var(--my,45%), #000 0%, rgba(0,0,0,.55) 45%, transparent 75%);
+          mask-image: radial-gradient(ellipse 34% 46% at var(--mx,50%) var(--my,45%), #000 0%, rgba(0,0,0,.55) 45%, transparent 75%);
+  animation: dot-drift 18s linear infinite;
+  transform: translateY(var(--parallax, 0px));
+}
+/* warm glow under the dots */
+body.home .hero::after {
+  background: radial-gradient(ellipse 30% 40% at var(--mx,50%) var(--my,45%), rgba(224,90,43,.28), transparent 70%);
+  z-index: -2; transform: translateY(var(--parallax, 0px));
+}
+@keyframes dot-drift { to { background-position: 90px 90px; } }
+
+body.home h1 { font-size: clamp(3rem, min(9vw, 13vh), 8rem); line-height: .9; margin-bottom: 30px; }
+body.home .hero p.lede { margin-left: auto; margin-right: auto; }
+body.home .hero .kicker,
+body.home .hero .lede,
+body.home .hero .cta { opacity: 0; transform: translateY(24px); transition: opacity .9s ease, transform .9s ease; }
+body.ready.home .hero .kicker { opacity: 1; transform: none; transition-delay: .05s; }
+body.ready.home .hero .lede { opacity: 1; transform: none; transition-delay: .55s; }
+body.ready.home .hero .cta { opacity: 1; transform: none; transition-delay: .7s; }
+
+.scroll-cue {
+  margin-top: 34px; width: 22px; height: 22px; border-right: 2px solid var(--gold); border-bottom: 2px solid var(--gold);
+  transform: rotate(45deg); animation: cue 1.8s ease-in-out infinite; display: block;
+}
+@keyframes cue { 0%,100% { transform: translateY(0) rotate(45deg); opacity: .5; } 50% { transform: translateY(10px) rotate(45deg); opacity: 1; } }
+
+/* ---------- Buttons ---------- */
+.cta { position: relative; overflow: hidden; z-index: 0; transition: color .3s ease, transform .3s ease; background: var(--gold); }
+.cta::before { content: ""; position: absolute; inset: 0; background: var(--orange); transform: translateY(101%); transition: transform .35s cubic-bezier(.2,.8,.2,1); z-index: -1; }
+.cta:hover { background: var(--gold); color: var(--ink); transform: translateY(-2px); }
+.cta:hover::before { transform: none; }
+
+/* ---------- Tile grid (home sections) ---------- */
+body.home section { border-top: none; }
+body.home section .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+body.home .row {
+  position: relative; overflow: hidden; isolation: isolate;
+  border: 1px solid var(--line); padding: 30px 26px 34px; min-height: 230px;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  transition: transform .45s cubic-bezier(.2,.8,.2,1), color .35s ease, border-color .35s ease;
+}
+body.home .row:first-of-type { border-top: 1px solid var(--line); }
+body.home .row::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; background: var(--gold);
+  transform: translateY(101%); transition: transform .5s cubic-bezier(.2,.8,.2,1);
+}
+body.home .row:hover { transform: translateY(-6px) rotate(-.6deg); color: var(--teal-dark); border-color: var(--gold); }
+body.home .row:hover::before { transform: none; }
+body.home .row:hover .n,
+body.home .row:hover a.inline { color: var(--teal-dark); }
+body.home .row h3 { font-size: 1.7rem; }
+body.home .row h3 .n { display: block; font-size: 3.4rem; line-height: 1; margin-bottom: 14px; transition: transform .5s ease; }
+body.home .row:hover h3 .n { transform: translateX(8px); }
+
+/* ---------- Fade up on scroll ---------- */
+.reveal { opacity: 0; transform: translateY(40px); transition: transform 1s ease-in-out, opacity .8s ease-in-out; transition-delay: var(--d, 0s); }
+.reveal.in { opacity: 1; transform: none; }
+
+/* ---------- Gold footer band with endless ticker ---------- */
+main > footer {
+  margin: 80px 0 -70px; margin-left: calc(50% - 50vw); width: 100vw;
+  background: var(--gold); color: var(--teal-dark); opacity: 1;
+  padding: 40px 28px 0; font-family: Arial, Helvetica, sans-serif;
+}
+main > footer p { max-width: 1120px; margin: 0 auto 30px; }
+main > footer a { color: var(--teal-dark); font-weight: bold; }
+main > footer a:hover { color: var(--orange); }
+.ticker { overflow: hidden; white-space: nowrap; border-top: 1px solid rgba(9,48,57,.3); padding: 14px 0; margin: 0 -28px; }
+.ticker .track { display: inline-flex; animation: tick 28s linear infinite; }
+.ticker .track span { padding-right: 2.2em; text-transform: uppercase; letter-spacing: .18em; font-size: .85rem; font-weight: bold; }
+.ticker:hover .track { animation-play-state: paused; }
+@keyframes tick { to { transform: translateX(-50%); } }
+body.home .marquee { display: none; }
+
+/* ---------- Small screens ---------- */
+@media (max-width: 760px) {
+  header.site { padding: 12px 16px; gap: 8px; }
+  header.site.scrolled { padding: 8px 16px; }
+  header.site img { width: 104px; }
+  nav { font-size: .66rem; letter-spacing: .1em; }
+  main { padding-top: 120px; }
+  body.home section .tiles { grid-template-columns: 1fr; }
+  body.home .row { min-height: 170px; }
+}
+
+/* ---------- Respect people who turn motion off ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .reveal, h1 .line > span, body.home .hero .kicker, body.home .hero .lede, body.home .hero .cta { opacity: 1 !important; transform: none !important; }
+  header.site img { transform: none !important; }
+}
