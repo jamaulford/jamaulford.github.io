@@ -73,7 +73,13 @@
     if (header) header.classList.toggle('scrolled', y > 40);
     if (!reduce) {
       if (logo) logo.style.transform = 'rotate(' + (y * 0.12).toFixed(1) + 'deg)';
-      if (heroEl) heroEl.style.setProperty('--parallax', (y * 0.35).toFixed(0) + 'px');
+      if (heroEl) {
+        heroEl.style.setProperty('--parallax', (y * 0.35).toFixed(0) + 'px');
+        // video rides up faster than the page and fades as it leaves
+        var h = heroEl.offsetHeight || 1;
+        heroEl.style.setProperty('--lift', (-y * 0.3).toFixed(0) + 'px');
+        heroEl.style.setProperty('--fade', Math.max(0, 1 - y / (h * 1.2)).toFixed(3));
+      }
     }
     ticking = false;
   }
@@ -92,6 +98,9 @@
       heroEl.style.setProperty('--my', yy.toFixed(1) + '%');
     });
   }
+
+  // People who turn motion off get the still poster frame
+  if (reduce) document.querySelectorAll('.hero-media video').forEach(function (v) { v.removeAttribute('autoplay'); v.pause(); });
 
   requestAnimationFrame(function () { requestAnimationFrame(function () { body.classList.add('ready'); }); });
 })();
