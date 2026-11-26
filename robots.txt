@@ -2,3 +2,5 @@ User-agent: *
 Allow: /
 
 Sitemap: https://jamaulford.com/sitemap.xml
+
+# Live since November 25, 2026.
